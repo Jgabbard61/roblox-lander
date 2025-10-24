@@ -423,14 +423,13 @@ export default function ContactSection() {
               
               <div 
                 className="calendly-inline-widget" 
-                data-url="https://calendly.com/YOUR_USERNAME/YOUR_EVENT?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=3b82f6"
+                data-url="https://calendly.com/jgabbard61/30min?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=3b82f6"
                 style={{ minWidth: '320px', height: '700px' }}
               ></div>
               
               <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
                 <p className="text-sm text-gray-700 text-center">
-                  <strong>Note:</strong> After configuring your Calendly account, replace the placeholder URL above with your actual Calendly event URL. 
-                  The widget will then display your availability and allow visitors to book meetings directly.
+                  <strong>Pro Tip:</strong> Select a time that works best for you, and you'll receive a confirmation email with meeting details.
                 </p>
               </div>
             </div>
