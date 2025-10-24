@@ -19,7 +19,7 @@ export default function PricingSection() {
     {
       name: "Basic Lookup",
       icon: Zap,
-      price: "$[TBD]",
+      price: "$100",
       unit: "per lookup",
       description: "Standard verification for exact username matches",
       gradient: "from-blue-500 to-blue-600",
@@ -34,7 +34,7 @@ export default function PricingSection() {
     {
       name: "Smart Search",
       icon: Brain,
-      price: "$[TBD]",
+      price: "$100",
       unit: "per lookup",
       description: "Advanced fuzzy matching for misspelled or unknown usernames",
       gradient: "from-purple-500 to-purple-600",

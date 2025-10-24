@@ -432,7 +432,7 @@ export default function ContactSection() {
               {/* Calendly inline widget begin */}
               <div 
                 className="calendly-inline-widget" 
-                data-url="https://calendly.com/jgabbard61"
+                data-url="https://calendly.com/jgabbard61/30min"
                 style={{ minWidth: '320px', height: '700px' }}
               ></div>
               {/* Calendly inline widget end */}
