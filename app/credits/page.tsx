@@ -20,7 +20,7 @@ export default function CreditsPage() {
       name: "Exact Search",
       icon: Zap,
       credits: 1,
-      price: "$50",
+      price: "$100",
       description: "Precise username matching for direct lookups",
       gradient: "from-blue-500 to-blue-600",
       features: [
@@ -35,7 +35,7 @@ export default function CreditsPage() {
       name: "Smart Search",
       icon: Brain,
       credits: 2,
-      price: "$100",
+      price: "$200",
       description: "AI-powered fuzzy matching with ranked results",
       gradient: "from-purple-500 to-purple-600",
       popular: true,
@@ -69,8 +69,8 @@ export default function CreditsPage() {
     {
       name: "Starter",
       credits: 10,
-      price: 500,
-      pricePerCredit: 50,
+      price: 1000,
+      pricePerCredit: 100,
       exactSearches: "10 searches",
       smartSearches: "5 searches",
       gradient: "from-blue-400 to-blue-500",
@@ -79,8 +79,8 @@ export default function CreditsPage() {
     {
       name: "Professional",
       credits: 50,
-      price: 2500,
-      pricePerCredit: 50,
+      price: 5000,
+      pricePerCredit: 100,
       exactSearches: "50 searches",
       smartSearches: "25 searches",
       gradient: "from-purple-500 to-purple-600",
@@ -90,8 +90,8 @@ export default function CreditsPage() {
     {
       name: "Business",
       credits: 100,
-      price: 5000,
-      pricePerCredit: 50,
+      price: 10000,
+      pricePerCredit: 100,
       exactSearches: "100 searches",
       smartSearches: "50 searches",
       gradient: "from-indigo-500 to-indigo-600",
@@ -100,8 +100,8 @@ export default function CreditsPage() {
     {
       name: "Enterprise",
       credits: 200,
-      price: 10000,
-      pricePerCredit: 50,
+      price: 20000,
+      pricePerCredit: 100,
       exactSearches: "200 searches",
       smartSearches: "100 searches",
       gradient: "from-pink-500 to-pink-600",
@@ -112,7 +112,7 @@ export default function CreditsPage() {
   const faqs = [
     {
       question: "How do credits work?",
-      answer: "Credits are consumed when you perform searches. Each credit costs $50. Exact Search uses 1 credit ($50), while Smart Search uses 2 credits ($100) due to AI-powered processing. Credits never expire and can be used at any time."
+      answer: "Credits are consumed when you perform searches. Each credit costs $100. Exact Search uses 1 credit ($100), while Smart Search uses 2 credits ($200) due to AI-powered processing. Credits never expire and can be used at any time."
     },
     {
       question: "What happens if a search finds no results?",
@@ -163,7 +163,7 @@ export default function CreditsPage() {
               Simple <span className="text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text">Credit-Based</span> Pricing
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8">
-              Pay only for what you use. No subscriptions, no hidden fees. Each credit costs just $50.
+              Pay only for what you use. No subscriptions, no hidden fees. Each credit costs just $100.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.button
@@ -278,7 +278,7 @@ export default function CreditsPage() {
               Choose Your <span className="text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text">Credit Package</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              All packages include the same $50 per credit rate. Purchase more credits at once for larger investigations.
+              All packages include the same $100 per credit rate. Purchase more credits at once for larger investigations.
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm text-gray-600 bg-white py-3 px-6 rounded-lg shadow-sm inline-block">
               <Shield className="w-4 h-4 text-green-600" />
