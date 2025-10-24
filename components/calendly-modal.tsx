@@ -47,7 +47,7 @@ export default function CalendlyModal({ isOpen, onClose }: CalendlyModalProps) {
           {/* Calendly inline widget */}
           <div
             className="calendly-inline-widget"
-            data-url="https://calendly.com/jgabbard61"
+            data-url="https://calendly.com/jgabbard61/30min"
             style={{ minWidth: '320px', height: '700px' }}
           ></div>
         </div>
