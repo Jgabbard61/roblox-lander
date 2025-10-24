@@ -29,7 +29,7 @@ export default function HeroSection() {
           onLoadedData={() => setVideoLoaded(true)}
           onError={() => setVideoError(true)}
         >
-          <source src="/verifylens_hero_background.mp4" type="video/mp4" />
+          <source src="https://raw.githubusercontent.com/Jgabbard61/roblox-lander/main/public/verifylens_hero_background.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       )}
