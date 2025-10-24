@@ -1,57 +1,33 @@
 
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, ShieldCheck, Zap } from 'lucide-react'
+import CalendlyModal from './calendly-modal'
 
 export default function HeroSection() {
+  const [isCalendlyModalOpen, setIsCalendlyModalOpen] = useState(false)
+  
   const scrollToContact = () => {
     document?.getElementById?.('contact')?.scrollIntoView?.({ behavior: 'smooth' })
   }
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* 
-        VIDEO BACKGROUND INSTRUCTIONS:
-        ================================
-        To add your video background:
-        
-        1. Place your video file in the /public folder (e.g., /public/hero-video.mp4)
-        
-        2. Uncomment the <video> element below and update the src path
-        
-        3. Recommended video specs:
-           - Format: MP4 (H.264 codec for best browser support)
-           - Resolution: 1920x1080 or higher
-           - File size: Under 10MB for fast loading
-           - Duration: 10-30 seconds (loops automatically)
-           - No audio track needed
-        
-        4. For better performance, consider:
-           - Using a CDN or cloud storage (AWS S3, Cloudflare)
-           - Creating multiple formats (MP4, WebM) for browser compatibility
-           - Adding a poster image (first frame) for instant display
-        
-        5. Current placeholder: Gradient background (safe fallback)
-      */}
-      
-      {/* Video Background - UNCOMMENT AND CONFIGURE WHEN READY */}
-      {/* 
+      {/* Video Background */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        poster="/hero-poster.jpg"
         className="absolute inset-0 w-full h-full object-cover z-0"
       >
-        <source src="/hero-video.mp4" type="video/mp4" />
-        <source src="/hero-video.webm" type="video/webm" />
+        <source src="https://cdn.abacus.ai/videos/b785fcec-ee94-472d-922f-f4a084c14e21.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-      */}
       
-      {/* Gradient Placeholder Background (remove when video is added) */}
+      {/* Gradient Fallback Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 z-0"></div>
       
       {/* Dark Overlay for better text readability over video */}
@@ -92,12 +68,18 @@ export default function HeroSection() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={scrollToContact}
+              onClick={() => setIsCalendlyModalOpen(true)}
               className="px-8 py-4 bg-white/95 text-gray-800 font-semibold rounded-lg shadow-2xl border-2 border-white/50 hover:bg-white hover:shadow-3xl transition-all duration-200 backdrop-blur-sm"
             >
               Schedule a Demo
             </motion.button>
           </div>
+          
+          {/* Calendly Modal */}
+          <CalendlyModal 
+            isOpen={isCalendlyModalOpen} 
+            onClose={() => setIsCalendlyModalOpen(false)} 
+          />
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <motion.div
