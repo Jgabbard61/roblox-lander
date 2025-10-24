@@ -47,9 +47,23 @@ export default function CalendlyModal({ isOpen, onClose }: CalendlyModalProps) {
           {/* Calendly inline widget */}
           <div
             className="calendly-inline-widget"
-            data-url="https://calendly.com/jgabbard61/30min"
-            style={{ minWidth: '320px', height: '700px' }}
-          ></div>
+            data-url="https://calendly.com/jgabbard61/30min?primary_color=6366f1"
+            style={{ position: 'relative', minWidth: '320px', height: '700px' }}
+            data-processed="true"
+          >
+            <div className="calendly-spinner">
+              <div className="calendly-bounce1"></div>
+              <div className="calendly-bounce2"></div>
+              <div className="calendly-bounce3"></div>
+            </div>
+            <iframe
+              src={`https://calendly.com/jgabbard61/30min?embed_domain=${typeof window !== 'undefined' ? window.location.hostname : 'verifylens.com'}&embed_type=Inline&primary_color=6366f1`}
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              title="Select a Date & Time - Calendly"
+            ></iframe>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
