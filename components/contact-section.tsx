@@ -420,7 +420,7 @@ export default function ContactSection() {
                   <div className="calendly-bounce3"></div>
                 </div>
                 <iframe
-                  src={`https://calendly.com/jgabbard61/30min?embed_domain=${typeof window !== 'undefined' ? window.location.hostname : 'verifylens.com'}&embed_type=Inline&primary_color=6366f1`}
+                  src="https://calendly.com/jgabbard61/30min?embed_domain=verifylens.com&embed_type=Inline&primary_color=6366f1"
                   width="100%"
                   height="100%"
                   frameBorder="0"
