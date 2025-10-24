@@ -27,13 +27,21 @@ export default function ContactSection() {
 
   // Load Calendly widget script
   useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://assets.calendly.com/assets/external/widget.js'
-    script.async = true
-    document.body.appendChild(script)
+    // Check if script already exists
+    const existingScript = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]')
     
-    return () => {
-      document.body.removeChild(script)
+    if (!existingScript) {
+      const script = document.createElement('script')
+      script.src = 'https://assets.calendly.com/assets/external/widget.js'
+      script.async = true
+      document.head.appendChild(script)
+      
+      return () => {
+        // Only remove if we added it
+        if (script.parentNode) {
+          script.parentNode.removeChild(script)
+        }
+      }
     }
   }, [])
 
@@ -421,11 +429,13 @@ export default function ContactSection() {
                 Current placeholder: Replace 'YOUR_USERNAME' and 'YOUR_EVENT' with your actual Calendly details
               */}
               
+              {/* Calendly inline widget begin */}
               <div 
                 className="calendly-inline-widget" 
-                data-url="https://calendly.com/jgabbard61/30min?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=3b82f6"
+                data-url="https://calendly.com/verifylens/30min"
                 style={{ minWidth: '320px', height: '700px' }}
               ></div>
+              {/* Calendly inline widget end */}
               
               <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
                 <p className="text-sm text-gray-700 text-center">

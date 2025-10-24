@@ -22,8 +22,9 @@ export default function HeroSection() {
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-0"
+        preload="auto"
       >
-        <source src="https://cdn.abacus.ai/videos/b785fcec-ee94-472d-922f-f4a084c14e21.mp4" type="video/mp4" />
+        <source src="/verifylens_hero_background.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       
