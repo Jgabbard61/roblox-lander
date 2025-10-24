@@ -175,7 +175,7 @@ export default function PricingSection() {
                 onClick={scrollToContact}
                 className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
               >
-                Start Free Trial
+                Schedule a Demo
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}

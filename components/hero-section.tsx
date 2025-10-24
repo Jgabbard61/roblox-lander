@@ -10,8 +10,55 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center py-20 px-4 pt-24">
-      <div className="max-w-6xl mx-auto text-center">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* 
+        VIDEO BACKGROUND INSTRUCTIONS:
+        ================================
+        To add your video background:
+        
+        1. Place your video file in the /public folder (e.g., /public/hero-video.mp4)
+        
+        2. Uncomment the <video> element below and update the src path
+        
+        3. Recommended video specs:
+           - Format: MP4 (H.264 codec for best browser support)
+           - Resolution: 1920x1080 or higher
+           - File size: Under 10MB for fast loading
+           - Duration: 10-30 seconds (loops automatically)
+           - No audio track needed
+        
+        4. For better performance, consider:
+           - Using a CDN or cloud storage (AWS S3, Cloudflare)
+           - Creating multiple formats (MP4, WebM) for browser compatibility
+           - Adding a poster image (first frame) for instant display
+        
+        5. Current placeholder: Gradient background (safe fallback)
+      */}
+      
+      {/* Video Background - UNCOMMENT AND CONFIGURE WHEN READY */}
+      {/* 
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="/hero-poster.jpg"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      >
+        <source src="/hero-video.mp4" type="video/mp4" />
+        <source src="/hero-video.webm" type="video/webm" />
+        Your browser does not support the video tag.
+      </video>
+      */}
+      
+      {/* Gradient Placeholder Background (remove when video is added) */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 z-0"></div>
+      
+      {/* Dark Overlay for better text readability over video */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 z-10"></div>
+      
+      {/* Content Overlay */}
+      <div className="relative z-20 max-w-6xl mx-auto text-center px-4 py-20 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -19,16 +66,16 @@ export default function HeroSection() {
         >
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
-              <Search className="relative w-20 h-20 text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+              <Search className="relative w-20 h-20 text-white drop-shadow-lg" />
             </div>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">
-            Verify <span className="text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text">Roblox Users</span> Instantly for Your Legal Cases
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl">
+            Verify <span className="text-transparent bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text">Roblox Users</span> Instantly
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-white/95 mb-8 max-w-4xl mx-auto leading-relaxed drop-shadow-lg">
             Trusted verification for law firms handling cases involving minors, gaming disputes, and digital identity verification. Get instant, accurate results with our Smart Search technology.
           </p>
           
@@ -37,7 +84,7 @@ export default function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={scrollToContact}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
             >
               Start Verifying Now
             </motion.button>
@@ -46,9 +93,9 @@ export default function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={scrollToContact}
-              className="px-8 py-4 bg-white text-gray-700 font-semibold rounded-lg shadow-lg border-2 border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-200"
+              className="px-8 py-4 bg-white/95 text-gray-800 font-semibold rounded-lg shadow-2xl border-2 border-white/50 hover:bg-white hover:shadow-3xl transition-all duration-200 backdrop-blur-sm"
             >
-              Schedule Demo
+              Schedule a Demo
             </motion.button>
           </div>
           
@@ -57,7 +104,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/20"
+              className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-2xl border border-white/30"
             >
               <Zap className="w-8 h-8 text-blue-500 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Instant Results</h3>
@@ -68,7 +115,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/20"
+              className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-2xl border border-white/30"
             >
               <Search className="w-8 h-8 text-purple-500 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Smart Search</h3>
@@ -79,7 +126,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/20"
+              className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-2xl border border-white/30"
             >
               <ShieldCheck className="w-8 h-8 text-green-500 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Secure & Compliant</h3>
