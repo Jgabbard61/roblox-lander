@@ -3,8 +3,8 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { useState } from 'react'
-import { Send, Mail, Phone, Building } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Send, Mail, Phone, Building, Calendar } from 'lucide-react'
 
 export default function ContactSection() {
   const [ref, inView] = useInView({
@@ -23,6 +23,19 @@ export default function ContactSection() {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [activeTab, setActiveTab] = useState<'form' | 'schedule'>('form')
+
+  // Load Calendly widget script
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://assets.calendly.com/assets/external/widget.js'
+    script.async = true
+    document.body.appendChild(script)
+    
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
 
   const usageOptions = [
     { value: '', label: 'Select estimated monthly usage...' },
@@ -104,29 +117,57 @@ export default function ContactSection() {
 
   return (
     <section className="py-20 px-4 bg-gradient-to-br from-gray-50 to-purple-50" id="contact">
-      <div className="max-w-6xl mx-auto" ref={ref}>
+      <div className="max-w-7xl mx-auto" ref={ref}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Ready to Get <span className="text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text">Started?</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
             Contact us to learn how VerifyLens can streamline your legal verification process and help you win more cases.
           </p>
+          
+          {/* Tab Navigation */}
+          <div className="flex justify-center gap-4 mb-8">
+            <button
+              onClick={() => setActiveTab('form')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                activeTab === 'form'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Mail className="w-5 h-5" />
+              Send Message
+            </button>
+            <button
+              onClick={() => setActiveTab('schedule')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                activeTab === 'schedule'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Calendar className="w-5 h-5" />
+              Schedule a Demo
+            </button>
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Get in Touch</h3>
+        {/* Tabbed Content */}
+        {activeTab === 'form' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="bg-white p-8 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">Get in Touch</h3>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -341,6 +382,60 @@ export default function ContactSection() {
             </div>
           </motion.div>
         </div>
+        ) : (
+          /* Calendly Tab */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-5xl mx-auto"
+          >
+            <div className="bg-white p-8 rounded-xl shadow-lg">
+              <div className="text-center mb-6">
+                <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold text-gray-900 mb-3">Schedule Your Demo</h3>
+                <p className="text-gray-600">
+                  Book a personalized demo with our team to see how VerifyLens can help your law firm.
+                </p>
+              </div>
+              
+              {/* 
+                CALENDLY INTEGRATION INSTRUCTIONS:
+                ====================================
+                To add your Calendly scheduling widget:
+                
+                1. Log in to your Calendly account at https://calendly.com
+                
+                2. Go to your event type (e.g., "Demo Call", "Consultation")
+                
+                3. Click "Share" or "Embed" on the event
+                
+                4. Select "Inline Embed" option
+                
+                5. Copy your Calendly URL (it will look like: https://calendly.com/your-username/demo)
+                
+                6. Replace the placeholder URL below with your actual Calendly URL
+                
+                7. The widget will automatically load and display your calendar
+                
+                Current placeholder: Replace 'YOUR_USERNAME' and 'YOUR_EVENT' with your actual Calendly details
+              */}
+              
+              <div 
+                className="calendly-inline-widget" 
+                data-url="https://calendly.com/YOUR_USERNAME/YOUR_EVENT?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=3b82f6"
+                style={{ minWidth: '320px', height: '700px' }}
+              ></div>
+              
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                <p className="text-sm text-gray-700 text-center">
+                  <strong>Note:</strong> After configuring your Calendly account, replace the placeholder URL above with your actual Calendly event URL. 
+                  The widget will then display your availability and allow visitors to book meetings directly.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </section>
   )
