@@ -407,34 +407,26 @@ export default function ContactSection() {
                 </p>
               </div>
               
-              {/* 
-                CALENDLY INTEGRATION INSTRUCTIONS:
-                ====================================
-                To add your Calendly scheduling widget:
-                
-                1. Log in to your Calendly account at https://calendly.com
-                
-                2. Go to your event type (e.g., "Demo Call", "Consultation")
-                
-                3. Click "Share" or "Embed" on the event
-                
-                4. Select "Inline Embed" option
-                
-                5. Copy your Calendly URL (it will look like: https://calendly.com/your-username/demo)
-                
-                6. Replace the placeholder URL below with your actual Calendly URL
-                
-                7. The widget will automatically load and display your calendar
-                
-                Current placeholder: Replace 'YOUR_USERNAME' and 'YOUR_EVENT' with your actual Calendly details
-              */}
-              
               {/* Calendly inline widget begin */}
               <div 
                 className="calendly-inline-widget" 
-                data-url="https://calendly.com/jgabbard61/30min"
-                style={{ minWidth: '320px', height: '700px' }}
-              ></div>
+                data-url="https://calendly.com/jgabbard61/30min?primary_color=6366f1"
+                style={{ position: 'relative', minWidth: '320px', height: '700px' }}
+                data-processed="true"
+              >
+                <div className="calendly-spinner">
+                  <div className="calendly-bounce1"></div>
+                  <div className="calendly-bounce2"></div>
+                  <div className="calendly-bounce3"></div>
+                </div>
+                <iframe
+                  src={`https://calendly.com/jgabbard61/30min?embed_domain=${typeof window !== 'undefined' ? window.location.hostname : 'verifylens.com'}&embed_type=Inline&primary_color=6366f1`}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  title="Select a Date & Time - Calendly"
+                ></iframe>
+              </div>
               {/* Calendly inline widget end */}
               
               <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
