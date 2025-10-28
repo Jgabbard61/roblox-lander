@@ -2,18 +2,37 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Check, Zap, Brain, Eye, Star, CreditCard, Shield, AlertCircle, HelpCircle, Mail } from 'lucide-react'
+import { Check, Zap, Brain, Eye, Star, CreditCard, Shield, AlertCircle, HelpCircle, Mail, Loader2 } from 'lucide-react'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { loadStripe } from '@stripe/stripe-js'
+import toast from 'react-hot-toast'
 
-export default function CreditsPage() {
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
+function CreditsContent() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1
   })
 
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [loadingPackage, setLoadingPackage] = useState<number | null>(null)
+  const searchParams = useSearchParams()
+
+  // Check if user canceled checkout
+  useEffect(() => {
+    const canceled = searchParams.get('canceled')
+    if (canceled === 'true') {
+      toast.error('Checkout canceled. You can try again whenever you're ready.')
+      // Remove the query parameter from URL
+      window.history.replaceState({}, '', '/credits')
+    }
+  }, [searchParams])
 
   const searchTypes = [
     {
@@ -140,11 +159,53 @@ export default function CreditsPage() {
     window.location.href = '/#contact'
   }
 
-  const handlePurchase = (packageIndex: number) => {
+  const handlePurchase = async (packageIndex: number) => {
     setSelectedPackage(packageIndex)
-    // Placeholder for Stripe integration
-    alert('Stripe integration coming soon! For now, please contact us to purchase credits.')
-    scrollToContact()
+    setIsLoading(true)
+    setLoadingPackage(packageIndex)
+    
+    try {
+      const pkg = packages[packageIndex]
+      
+      // Create checkout session
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          packageName: pkg.name,
+          credits: pkg.credits,
+          price: pkg.price, // Price in cents
+          email: '', // Will be collected by Stripe checkout
+          customerName: '', // Will be collected by Stripe checkout
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session')
+      }
+
+      // Redirect to Stripe Checkout
+      const stripe = await stripePromise
+      if (!stripe) {
+        throw new Error('Stripe failed to initialize')
+      }
+
+      // Redirect to checkout URL
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error('No checkout URL received')
+      }
+    } catch (error: any) {
+      console.error('Error initiating checkout:', error)
+      toast.error(error.message || 'Failed to initiate checkout. Please try again.')
+      setIsLoading(false)
+      setLoadingPackage(null)
+    }
   }
 
   return (
@@ -338,16 +399,24 @@ export default function CreditsPage() {
                 </div>
 
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: loadingPackage === index ? 1 : 1.05 }}
+                  whileTap={{ scale: loadingPackage === index ? 1 : 0.95 }}
                   onClick={() => handlePurchase(index)}
-                  className={`w-full py-3 px-6 font-semibold rounded-lg shadow-lg transition-all duration-200 ${
+                  disabled={isLoading}
+                  className={`w-full py-3 px-6 font-semibold rounded-lg shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 ${
                     pkg.popular
                       ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
                       : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
-                  }`}
+                  } ${isLoading && loadingPackage !== index ? 'opacity-50 cursor-not-allowed' : ''} ${isLoading && loadingPackage === index ? 'opacity-90' : ''}`}
                 >
-                  Purchase Package
+                  {loadingPackage === index ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <span>Purchase Package</span>
+                  )}
                 </motion.button>
               </motion.div>
             ))}
@@ -461,5 +530,23 @@ export default function CreditsPage() {
 
       <Footer />
     </main>
+  )
+}
+
+export default function CreditsPage() {
+  return (
+    <Suspense fallback={
+      <main className="w-full">
+        <Header />
+        <section className="pt-32 pb-20 px-4 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+          <div className="max-w-6xl mx-auto text-center">
+            <p className="text-xl text-gray-600">Loading...</p>
+          </div>
+        </section>
+        <Footer />
+      </main>
+    }>
+      <CreditsContent />
+    </Suspense>
   )
 }
