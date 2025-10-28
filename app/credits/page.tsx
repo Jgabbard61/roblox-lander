@@ -28,7 +28,7 @@ function CreditsContent() {
   useEffect(() => {
     const canceled = searchParams.get('canceled')
     if (canceled === 'true') {
-      toast.error('Checkout canceled. You can try again whenever you're ready.')
+      toast.error("Checkout canceled. You can try again whenever you're ready.")
       // Remove the query parameter from URL
       window.history.replaceState({}, '', '/credits')
     }
