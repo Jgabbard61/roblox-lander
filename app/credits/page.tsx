@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer'
 import { Check, Zap, Brain, Eye, Star, CreditCard, Shield, AlertCircle, HelpCircle, Mail, Loader2 } from 'lucide-react'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
+import RegistrationModal from '@/components/registration-modal'
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
@@ -22,6 +23,8 @@ function CreditsContent() {
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingPackage, setLoadingPackage] = useState<number | null>(null)
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false)
+  const [registrationData, setRegistrationData] = useState<{ userId: number; customerId: number; email: string } | null>(null)
   const searchParams = useSearchParams()
 
   // Check if user canceled checkout
@@ -159,15 +162,28 @@ function CreditsContent() {
     window.location.href = '/#contact'
   }
 
-  const handlePurchase = async (packageIndex: number) => {
+  const handlePurchase = (packageIndex: number) => {
     setSelectedPackage(packageIndex)
+    setShowRegistrationModal(true)
+  }
+
+  const handleRegistrationSuccess = async (data: { userId: number; customerId: number; email: string }) => {
+    setRegistrationData(data)
+    setShowRegistrationModal(false)
     setIsLoading(true)
-    setLoadingPackage(packageIndex)
-    
+    setLoadingPackage(selectedPackage)
+
+    if (selectedPackage === null) {
+      toast.error('No package selected')
+      setIsLoading(false)
+      setLoadingPackage(null)
+      return
+    }
+
     try {
-      const pkg = packages[packageIndex]
+      const pkg = packages[selectedPackage]
       
-      // Create checkout session
+      // Create checkout session with user info
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -177,15 +193,16 @@ function CreditsContent() {
           packageName: pkg.name,
           credits: pkg.credits,
           price: pkg.price, // Price in cents
-          email: '', // Will be collected by Stripe checkout
-          customerName: '', // Will be collected by Stripe checkout
+          email: data.email,
+          customerId: data.customerId,
+          userId: data.userId,
         }),
       })
 
-      const data = await response.json()
+      const responseData = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout session')
+        throw new Error(responseData.error || 'Failed to create checkout session')
       }
 
       // Redirect to Stripe Checkout
@@ -195,8 +212,8 @@ function CreditsContent() {
       }
 
       // Redirect to checkout URL
-      if (data.url) {
-        window.location.href = data.url
+      if (responseData.url) {
+        window.location.href = responseData.url
       } else {
         throw new Error('No checkout URL received')
       }
@@ -529,6 +546,18 @@ function CreditsContent() {
       </section>
 
       <Footer />
+
+      {/* Registration Modal */}
+      <RegistrationModal
+        isOpen={showRegistrationModal}
+        onClose={() => setShowRegistrationModal(false)}
+        onSuccess={handleRegistrationSuccess}
+        packageInfo={selectedPackage !== null ? {
+          name: packages[selectedPackage].name,
+          credits: packages[selectedPackage].credits,
+          price: packages[selectedPackage].price,
+        } : undefined}
+      />
     </main>
   )
 }

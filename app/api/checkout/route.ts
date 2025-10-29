@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { packageName, credits, price, email, customerId, customerName } = body
+    const { packageName, credits, price, email, customerId, userId, customerName } = body
 
     // Validate required fields
     if (!packageName || !credits || !price) {
@@ -19,9 +19,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate customer info
-    if (!email && !customerId) {
+    if (!email || !customerId || !userId) {
       return NextResponse.json(
-        { error: 'Either email or customerId is required' },
+        { error: 'Email, customerId, and userId are required after registration' },
         { status: 400 }
       )
     }
@@ -50,8 +50,10 @@ export async function POST(req: NextRequest) {
         packageName,
         credits: credits.toString(),
         price: price.toString(),
-        customerId: customerId || '',
-        customerEmail: email || '',
+        customer_id: customerId.toString(),
+        user_id: userId.toString(),
+        package_id: '1', // Default package ID (can be updated if needed)
+        customerEmail: email,
         customerName: customerName || '',
         source: 'landing_page',
       },
@@ -61,8 +63,10 @@ export async function POST(req: NextRequest) {
           packageName,
           credits: credits.toString(),
           price: price.toString(),
-          customerId: customerId || '',
-          customerEmail: email || '',
+          customer_id: customerId.toString(),
+          user_id: userId.toString(),
+          package_id: '1', // Default package ID (can be updated if needed)
+          customerEmail: email,
           customerName: customerName || '',
           source: 'landing_page',
         },
