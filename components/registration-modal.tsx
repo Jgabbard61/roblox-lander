@@ -21,6 +21,7 @@ export default function RegistrationModal({ isOpen, onClose, onSuccess, packageI
     firstName: '',
     lastName: '',
     email: '',
+    username: '',
     phoneNumber: '',
     companyName: '',
     password: '',
@@ -55,6 +56,7 @@ export default function RegistrationModal({ isOpen, onClose, onSuccess, packageI
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required'
     if (!formData.email.trim()) newErrors.email = 'Email is required'
+    if (!formData.username.trim()) newErrors.username = 'Username is required'
     if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required'
     if (!formData.password) newErrors.password = 'Password is required'
     if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password'
@@ -63,6 +65,12 @@ export default function RegistrationModal({ isOpen, onClose, onSuccess, packageI
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = 'Invalid email format'
+    }
+
+    // Username validation
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/
+    if (formData.username && !usernameRegex.test(formData.username)) {
+      newErrors.username = 'Username must be 3-20 characters, alphanumeric and underscores only'
     }
 
     // Password validation
@@ -101,6 +109,7 @@ export default function RegistrationModal({ isOpen, onClose, onSuccess, packageI
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
           email: formData.email.trim().toLowerCase(),
+          username: formData.username.trim().toLowerCase(),
           phoneNumber: formData.phoneNumber.trim() || undefined,
           companyName: formData.companyName.trim(),
           password: formData.password,
@@ -162,7 +171,7 @@ export default function RegistrationModal({ isOpen, onClose, onSuccess, packageI
             <div className="p-8 pb-6 border-b border-gray-100">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Your Account</h2>
               <p className="text-gray-600">
-                Register to purchase {packageInfo ? `${packageInfo.credits} credits for $${(packageInfo.price / 100).toLocaleString()}` : 'credits'}
+                Register to purchase {packageInfo ? `${packageInfo.name} - ${packageInfo.credits} credits for $${(packageInfo.price / 100).toLocaleString()}` : 'credits'}
               </p>
             </div>
 
@@ -239,6 +248,33 @@ export default function RegistrationModal({ isOpen, onClose, onSuccess, packageI
                     {errors.email}
                   </p>
                 )}
+              </div>
+
+              {/* Username */}
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                  Username <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={formData.username}
+                  onChange={(e) => handleInputChange('username', e.target.value)}
+                  disabled={isLoading}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                    errors.username ? 'border-red-500' : 'border-gray-300'
+                  } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                  placeholder="johndoe123"
+                />
+                {errors.username && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.username}
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  This will be your login username. 3-20 characters, alphanumeric and underscores only.
+                </p>
               </div>
 
               {/* Phone Number */}
