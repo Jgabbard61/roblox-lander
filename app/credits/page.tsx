@@ -91,7 +91,7 @@ function CreditsContent() {
     {
       name: "Starter",
       credits: 10,
-      price: 1000,
+      price: 100000, // $1,000 in cents
       pricePerCredit: 100,
       exactSearches: "10 searches",
       smartSearches: "5 searches",
@@ -101,7 +101,7 @@ function CreditsContent() {
     {
       name: "Professional",
       credits: 50,
-      price: 5000,
+      price: 500000, // $5,000 in cents
       pricePerCredit: 100,
       exactSearches: "50 searches",
       smartSearches: "25 searches",
@@ -112,7 +112,7 @@ function CreditsContent() {
     {
       name: "Business",
       credits: 100,
-      price: 10000,
+      price: 1000000, // $10,000 in cents
       pricePerCredit: 100,
       exactSearches: "100 searches",
       smartSearches: "50 searches",
@@ -122,7 +122,7 @@ function CreditsContent() {
     {
       name: "Enterprise",
       credits: 200,
-      price: 20000,
+      price: 2000000, // $20,000 in cents
       pricePerCredit: 100,
       exactSearches: "200 searches",
       smartSearches: "100 searches",
