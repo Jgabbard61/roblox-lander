@@ -171,7 +171,7 @@ export default function RegistrationModal({ isOpen, onClose, onSuccess, packageI
             <div className="p-8 pb-6 border-b border-gray-100">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Your Account</h2>
               <p className="text-gray-600">
-                Register to purchase {packageInfo ? `${packageInfo.name} - ${packageInfo.credits} credits for $${(packageInfo.price / 100).toLocaleString()}` : 'credits'}
+                Register to purchase {packageInfo ? `${packageInfo.name} - ${packageInfo.credits} credits for $${packageInfo.price.toLocaleString()}` : 'credits'}
               </p>
             </div>
 
