@@ -134,11 +134,11 @@ function CreditsContent() {
   const faqs = [
     {
       question: "How do credits work?",
-      answer: "Credits are consumed when you perform searches. Each credit costs $100. Exact Search uses 1 credit ($100), while Smart Search uses 2 credits ($200) due to AI-powered processing. Credits never expire and can be used at any time."
+      answer: "Credits are consumed when you perform searches. Each credit costs $100. Both Exact Search and Smart Search use 1 credit ($100) per search. Credits never expire and can be used at any time."
     },
     {
       question: "What happens if a search finds no results?",
-      answer: "Exact Search: If no user is found, you are NOT charged any credits. Smart Search: You will be charged 2 credits even if no results are found, as the AI processing has been performed. We recommend using Exact Search first when possible."
+      answer: "Exact Search: If no user is found, you are NOT charged any credits. Smart Search: You will be charged 1 credit even if no results are found, as the AI processing has been performed. We recommend using Exact Search first when possible."
     },
     {
       question: "Do credits expire?",
