@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Check, Zap, Brain, TrendingUp, Star } from 'lucide-react'
+import { Check, Zap, Brain, Star } from 'lucide-react'
 
 export default function PricingSection() {
   const [ref, inView] = useInView({
@@ -133,34 +133,7 @@ export default function PricingSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="space-y-8"
         >
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 p-8 rounded-xl border border-green-100 text-center">
-            <TrendingUp className="w-12 h-12 text-green-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">Volume Discounts Available</h3>
-            <p className="text-gray-600 mb-4">
-              The more you use VerifyLens, the more you save. Automatic volume discounts apply for high-usage law firms.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center text-sm">
-              <div className="bg-white p-4 rounded-lg shadow">
-                <div className="font-semibold text-gray-900">1-100 lookups</div>
-                <div className="text-green-600">Standard rate</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow">
-                <div className="font-semibold text-gray-900">100-1,000 lookups</div>
-                <div className="text-green-600">5% discount</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow">
-                <div className="font-semibold text-gray-900">1,000-10,000 lookups</div>
-                <div className="text-green-600">10% discount</div>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow">
-                <div className="font-semibold text-gray-900">10,000+ lookups</div>
-                <div className="text-green-600">Custom pricing</div>
-              </div>
-            </div>
-          </div>
-
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-xl border border-blue-100 text-center">
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
               No Hidden Fees, No Contracts

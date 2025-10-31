@@ -36,6 +36,10 @@ export default function FAQSection() {
       answer: "Basic Lookup requires exact username matches and provides standard verification. Smart Search uses advanced fuzzy matching to find users even with misspellings, variations, or partial usernames - perfect when you're not sure of the exact spelling or when dealing with similar usernames."
     },
     {
+      question: "What happens if I search the same username multiple times?",
+      answer: "We don't charge you for usernames you've already searched. If you search for a username that you've previously looked up, we'll instantly retrieve the cached results at no additional cost, ensuring you never pay twice for the same information."
+    },
+    {
       question: "How quickly can I get verification results?",
       answer: "VerifyLens provides instant results in seconds, not hours or days. Once you enter a username, our system immediately processes the verification and provides comprehensive results that you can use immediately in your legal work."
     },
