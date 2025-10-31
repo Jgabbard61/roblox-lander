@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react'
 
 // Dynamically import Swagger UI to avoid SSR issues
 const SwaggerUI = dynamic(
-  () => import('swagger-ui-react').then(mod => mod.default),
+  () => import('swagger-ui-react'),
   {
     ssr: false,
     loading: () => (
@@ -24,21 +24,124 @@ const SwaggerUI = dynamic(
 )
 
 export default function ApiDocsPage() {
-  const [swaggerSpec, setSwaggerSpec] = useState(null)
+  const [swaggerSpec, setSwaggerSpec] = useState<any>(null)
 
   useEffect(() => {
-    // Load OpenAPI specification
-    fetch('/openapi.yaml')
-      .then(response => response.text())
-      .then(spec => {
-        // Parse YAML to JSON for SwaggerUI
-        const yamljs = require('yamljs')
-        const parsedSpec = yamljs.parse(spec)
-        setSwaggerSpec(parsedSpec)
-      })
-      .catch(error => {
-        console.error('Failed to load OpenAPI spec:', error)
-      })
+    // For now, use a simplified spec object directly instead of YAML parsing
+    const apiSpec = {
+      openapi: '3.0.3',
+      info: {
+        title: 'VerifyLens API',
+        description: 'Professional Roblox user verification API for law firms and businesses.',
+        version: '1.0.0'
+      },
+      servers: [
+        { url: 'https://api.verifylens.com/v1', description: 'Production server' },
+        { url: 'http://localhost:3000/api/v1', description: 'Development server' }
+      ],
+      paths: {
+        '/verify/smart': {
+          post: {
+            summary: 'Smart Verification',
+            description: 'Flexible Roblox user verification with optional filters',
+            operationId: 'smartVerify',
+            tags: ['Verification'],
+            security: [{ ApiKeyAuth: [] }],
+            requestBody: {
+              required: true,
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    required: ['username'],
+                    properties: {
+                      username: { type: 'string', example: 'JohnDoe123' },
+                      filters: {
+                        type: 'object',
+                        properties: {
+                          minAge: { type: 'integer', minimum: 0, maximum: 20 },
+                          verifiedBadge: { type: 'boolean' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            responses: {
+              '200': { description: 'Verification successful' },
+              '401': { description: 'Unauthorized' },
+              '429': { description: 'Rate limit exceeded' }
+            }
+          }
+        },
+        '/verify/exact': {
+          post: {
+            summary: 'Exact Verification',
+            description: 'Precise Roblox user verification for exact username matches',
+            operationId: 'exactVerify',
+            tags: ['Verification'],
+            security: [{ ApiKeyAuth: [] }],
+            requestBody: {
+              required: true,
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    required: ['username'],
+                    properties: {
+                      username: { type: 'string', example: 'ExactUsername' },
+                      userId: { type: 'string', example: '123456789' }
+                    }
+                  }
+                }
+              }
+            },
+            responses: {
+              '200': { description: 'Verification successful' },
+              '404': { description: 'User not found' }
+            }
+          }
+        },
+        '/account': {
+          get: {
+            summary: 'Get Account Information',
+            description: 'Retrieve account details and credit balance',
+            tags: ['Account'],
+            security: [{ ApiKeyAuth: [] }],
+            responses: {
+              '200': { description: 'Account information retrieved' }
+            }
+          }
+        },
+        '/usage': {
+          get: {
+            summary: 'Get API Usage History',
+            description: 'Retrieve detailed usage logs with pagination',
+            tags: ['Usage'],
+            security: [{ ApiKeyAuth: [] }],
+            parameters: [
+              { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+              { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+            ],
+            responses: {
+              '200': { description: 'Usage history retrieved' }
+            }
+          }
+        }
+      },
+      components: {
+        securitySchemes: {
+          ApiKeyAuth: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'X-API-Key'
+          }
+        }
+      }
+    }
+    
+    setSwaggerSpec(apiSpec)
   }, [])
 
   return (

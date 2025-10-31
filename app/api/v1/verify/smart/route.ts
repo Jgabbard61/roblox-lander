@@ -316,14 +316,10 @@ async function performSmartVerification(
   }
 
   if (includeHistory) {
-    mockData.user = {
-      ...mockData.user,
-      // Add mock history data
-      gameHistory: [
-        { gameName: 'Adopt Me!', lastPlayed: '2024-10-30T12:00:00Z' },
-        { gameName: 'Brookhaven', lastPlayed: '2024-10-29T15:30:00Z' }
-      ]
-    }
+    (mockData as any).gameHistory = [
+      { gameName: 'Adopt Me!', lastPlayed: '2024-10-30T12:00:00Z' },
+      { gameName: 'Brookhaven', lastPlayed: '2024-10-29T15:30:00Z' }
+    ]
   }
 
   // Apply filters

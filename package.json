@@ -92,6 +92,7 @@
     "gray-matter": "4.0.3",
     "input-otp": "1.2.4",
     "ioredis": "^5.8.2",
+    "is-number": "^7.0.0",
     "jotai": "2.6.0",
     "jsonwebtoken": "9.0.2",
     "lodash": "4.17.21",

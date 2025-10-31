@@ -15,9 +15,15 @@ interface RegistrationModalProps {
   isOpen: boolean
   onClose: () => void
   mode?: 'contact' | 'api' // Determine which form to show
+  onSuccess?: (data: { userId: number; customerId: number; email: string }) => void // For backward compatibility
+  packageInfo?: {
+    name: string
+    credits: number
+    price: number
+  } // For backward compatibility
 }
 
-export default function RegistrationModal({ isOpen, onClose, mode = 'contact' }: RegistrationModalProps) {
+export default function RegistrationModal({ isOpen, onClose, mode = 'contact', onSuccess, packageInfo }: RegistrationModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: '',

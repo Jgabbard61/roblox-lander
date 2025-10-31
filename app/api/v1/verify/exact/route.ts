@@ -319,9 +319,7 @@ async function performExactVerification(
   }
 
   if (includeProfile) {
-    mockData.user = {
-      ...mockData.user,
-      // Add detailed profile information
+    (mockData as any).profile = {
       description: 'Exact match verified user',
       friendsCount: Math.floor(Math.random() * 2000),
       followingCount: Math.floor(Math.random() * 500),
