@@ -1,444 +1,264 @@
+
 'use client'
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Eye, EyeOff, Loader2, CheckCircle, AlertCircle, Lock } from 'lucide-react'
+import { X, Mail, User, Building, Phone, MessageSquare, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import toast from 'react-hot-toast'
 
 interface RegistrationModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess: (data: { userId: number; customerId: number; email: string }) => void
-  packageInfo?: {
-    name: string
-    credits: number
-    price: number
-  }
+  mode?: 'contact' | 'api' // Determine which form to show
 }
 
-export default function RegistrationModal({ isOpen, onClose, onSuccess, packageInfo }: RegistrationModalProps) {
+export default function RegistrationModal({ isOpen, onClose, mode = 'contact' }: RegistrationModalProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    username: '',
-    phoneNumber: '',
     companyName: '',
-    password: '',
-    confirmPassword: '',
+    phoneNumber: '',
+    estimatedUsage: '',
+    message: ''
   })
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
-
-  // Password strength indicator
-  const getPasswordStrength = (password: string) => {
-    let strength = 0
-    if (password.length >= 8) strength++
-    if (/[a-z]/.test(password)) strength++
-    if (/[A-Z]/.test(password)) strength++
-    if (/[0-9]/.test(password)) strength++
-    if (/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) strength++
-    return strength
-  }
-
-  const passwordStrength = getPasswordStrength(formData.password)
-  const strengthColors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500']
-  const strengthLabels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong']
-
-  // Validation
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    // Required fields
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required'
-    if (!formData.email.trim()) newErrors.email = 'Email is required'
-    if (!formData.username.trim()) newErrors.username = 'Username is required'
-    if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required'
-    if (!formData.password) newErrors.password = 'Password is required'
-    if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password'
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (formData.email && !emailRegex.test(formData.email)) {
-      newErrors.email = 'Invalid email format'
-    }
-
-    // Username validation
-    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/
-    if (formData.username && !usernameRegex.test(formData.username)) {
-      newErrors.username = 'Username must be 3-20 characters, alphanumeric and underscores only'
-    }
-
-    // Password validation
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{}|;:,.<>?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{}|;:,.<>?]{8,}$/
-    if (formData.password && !passwordRegex.test(formData.password)) {
-      newErrors.password = 'Password must be at least 8 characters with uppercase, lowercase, number, and special character'
-    }
-
-    // Password match
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!validateForm()) {
-      toast.error('Please fix the errors in the form')
-      return
-    }
-
-    setIsLoading(true)
+    setIsSubmitting(true)
 
     try {
-      // Call registration API on main app
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/auth/register`, {
+      const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          email: formData.email.trim().toLowerCase(),
-          username: formData.username.trim().toLowerCase(),
-          phoneNumber: formData.phoneNumber.trim() || undefined,
-          companyName: formData.companyName.trim(),
-          password: formData.password,
-        }),
+          ...formData,
+          message: mode === 'api' 
+            ? `API Access Request: ${formData?.message || 'Requesting access to VerifyLens API integration.'}`
+            : formData?.message
+        })
       })
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed')
+      if (response.ok && data?.success) {
+        toast.success(
+          mode === 'api' 
+            ? 'API access request submitted successfully! We\'ll contact you soon with your credentials.'
+            : 'Contact form submitted successfully! We\'ll be in touch soon.'
+        )
+        setFormData({
+          name: '',
+          email: '',
+          companyName: '',
+          phoneNumber: '',
+          estimatedUsage: '',
+          message: ''
+        })
+        onClose()
+      } else {
+        throw new Error(data?.message || 'Submission failed')
       }
-
-      toast.success('Account created successfully! Please check your email to verify your account.')
-
-      // Call onSuccess with user/customer IDs
-      onSuccess({
-        userId: data.userId,
-        customerId: data.customerId,
-        email: data.email,
-      })
-
-    } catch (error: any) {
-      console.error('Registration error:', error)
-      toast.error(error.message || 'Registration failed. Please try again.')
+    } catch (error) {
+      console.error('Submission error:', error)
+      toast.error('Failed to submit form. Please try again.')
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    // Clear error for this field when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
-    }
-  }
+  const isFormValid = formData?.name?.trim() && 
+                     formData?.email?.trim() && 
+                     formData?.companyName?.trim() && 
+                     formData?.estimatedUsage
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
           >
-            {/* Close button */}
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
             {/* Header */}
-            <div className="p-8 pb-6 border-b border-gray-100">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Your Account</h2>
-              <p className="text-gray-600">
-                Register to purchase {packageInfo ? `${packageInfo.name} - ${packageInfo.credits} credits for $${packageInfo.price.toLocaleString()}` : 'credits'}
-              </p>
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {mode === 'api' ? 'Get API Access' : 'Contact Us'}
+                </h2>
+                <p className="text-gray-600 mt-1">
+                  {mode === 'api' 
+                    ? 'Request access to VerifyLens API integration'
+                    : 'Get in touch with our team'
+                  }
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="rounded-full hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              {/* Name fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                    First Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Name */}
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  Full Name *
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="name"
                     type="text"
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    disabled={isLoading}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                      errors.firstName ? 'border-red-500' : 'border-gray-300'
-                    } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                    placeholder="John"
+                    value={formData?.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Enter your full name"
+                    required
                   />
-                  {errors.firstName && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.firstName}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                    Last Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    disabled={isLoading}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                      errors.lastName ? 'border-red-500' : 'border-gray-300'
-                    } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                    placeholder="Doe"
-                  />
-                  {errors.lastName && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.lastName}
-                    </p>
-                  )}
                 </div>
               </div>
 
               {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                  placeholder="john.doe@lawfirm.com"
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-
-              {/* Username */}
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                  Username <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  value={formData.username}
-                  onChange={(e) => handleInputChange('username', e.target.value)}
-                  disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                    errors.username ? 'border-red-500' : 'border-gray-300'
-                  } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                  placeholder="johndoe123"
-                />
-                {errors.username && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.username}
-                  </p>
-                )}
-                <p className="mt-1 text-xs text-gray-500">
-                  This will be your login username. 3-20 characters, alphanumeric and underscores only.
-                </p>
-              </div>
-
-              {/* Phone Number */}
-              <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number (Optional)
-                </label>
-                <input
-                  type="tel"
-                  id="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                  disabled={isLoading}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  placeholder="+1 (555) 123-4567"
-                />
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Email Address *
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData?.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Enter your email address"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Company Name */}
-              <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Company/Law Firm Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="companyName"
-                  value={formData.companyName}
-                  onChange={(e) => handleInputChange('companyName', e.target.value)}
-                  disabled={isLoading}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                    errors.companyName ? 'border-red-500' : 'border-gray-300'
-                  } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                  placeholder="Smith & Associates"
-                />
-                {errors.companyName && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.companyName}
-                  </p>
-                )}
-              </div>
-
-              {/* Password */}
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password <span className="text-red-500">*</span>
-                </label>
+              <div className="space-y-2">
+                <Label htmlFor="companyName" className="text-sm font-medium text-gray-700">
+                  {mode === 'api' ? 'Company Name *' : 'Law Firm/Company *'}
+                </Label>
                 <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    disabled={isLoading}
-                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                      errors.password ? 'border-red-500' : 'border-gray-300'
-                    } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                    placeholder="••••••••"
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="companyName"
+                    type="text"
+                    value={formData?.companyName}
+                    onChange={(e) => handleInputChange('companyName', e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder={mode === 'api' ? 'Your company name' : 'Your law firm or company name'}
+                    required
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
                 </div>
-                
-                {/* Password strength indicator */}
-                {formData.password && (
-                  <div className="mt-2">
-                    <div className="flex gap-1 mb-1">
-                      {[...Array(5)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-1 flex-1 rounded-full transition-all ${
-                            i < passwordStrength ? strengthColors[passwordStrength - 1] : 'bg-gray-200'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <p className={`text-xs ${passwordStrength < 3 ? 'text-orange-600' : 'text-green-600'}`}>
-                      Password strength: {strengthLabels[passwordStrength - 1] || 'None'}
-                    </p>
-                  </div>
-                )}
-
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.password}
-                  </p>
-                )}
               </div>
 
-              {/* Confirm Password */}
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password <span className="text-red-500">*</span>
-                </label>
+              {/* Phone Number */}
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">
+                  Phone Number
+                </Label>
                 <div className="relative">
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    id="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    disabled={isLoading}
-                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                    } disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                    placeholder="••••••••"
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    value={formData?.phoneNumber}
+                    onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                    className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Your phone number"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={isLoading}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.confirmPassword}
-                  </p>
-                )}
-              </div>
-
-              {/* Info box */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Lock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-blue-900">
-                    <p className="font-semibold mb-1">Secure Registration</p>
-                    <p className="text-blue-700">
-                      Your information is encrypted and secure. You'll receive an email to verify your account before proceeding to checkout.
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              {/* Submit button */}
-              <button
+              {/* Estimated Usage */}
+              <div className="space-y-2">
+                <Label htmlFor="estimatedUsage" className="text-sm font-medium text-gray-700">
+                  Estimated Monthly Usage *
+                </Label>
+                <Select value={formData?.estimatedUsage} onValueChange={(value) => handleInputChange('estimatedUsage', value)}>
+                  <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectValue placeholder="Select your expected usage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1-100">1-100 verifications</SelectItem>
+                    <SelectItem value="100-1,000">100-1,000 verifications</SelectItem>
+                    <SelectItem value="1,000-10,000">1,000-10,000 verifications</SelectItem>
+                    <SelectItem value="10,000+">10,000+ verifications</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Message */}
+              <div className="space-y-2">
+                <Label htmlFor="message" className="text-sm font-medium text-gray-700">
+                  {mode === 'api' ? 'Integration Details' : 'Message'}
+                </Label>
+                <div className="relative">
+                  <MessageSquare className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                  <Textarea
+                    id="message"
+                    value={formData?.message}
+                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    className="pl-10 pt-3 min-h-[100px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                    placeholder={
+                      mode === 'api' 
+                        ? 'Tell us about your integration requirements, existing systems, or specific use cases...'
+                        : 'Tell us about your needs, questions, or how we can help...'
+                    }
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                disabled={!isFormValid || isSubmitting}
+                className="w-full h-12 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
-                  <>
+                {isSubmitting ? (
+                  <div className="flex items-center space-x-2">
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Creating Account...
-                  </>
+                    <span>Submitting...</span>
+                  </div>
                 ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Create Account & Continue
-                  </>
+                  mode === 'api' ? 'Request API Access' : 'Send Message'
                 )}
-              </button>
+              </Button>
 
-              <p className="text-xs text-center text-gray-500">
-                By creating an account, you agree to our Terms of Service and Privacy Policy
+              <p className="text-xs text-gray-500 text-center">
+                By submitting this form, you agree to be contacted by our team regarding your request.
               </p>
             </form>
           </motion.div>

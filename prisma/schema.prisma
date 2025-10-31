@@ -30,3 +30,90 @@ model ContactForm {
 
   @@map("contact_forms")
 }
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  name              String
+  companyName       String?
+  credits           Int      @default(0)
+  stripeCustomerId  String?  @unique
+  isActive          Boolean  @default(true)
+  isAdmin           Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  apiClient         ApiClient?
+  verificationCache VerificationCache[]
+
+  @@map("users")
+}
+
+model ApiClient {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  apiKey            String   @unique
+  apiKeyHash        String   @unique
+  isActive          Boolean  @default(true)
+  lastUsedAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiUsageLogs      ApiUsageLog[]
+  apiTransactions   ApiTransaction[]
+
+  @@map("api_clients")
+}
+
+model ApiUsageLog {
+  id                String   @id @default(cuid())
+  apiClientId       String
+  endpoint          String
+  requestId         String   @unique
+  creditsUsed       Int
+  wasSuccessful     Boolean
+  wasDuplicate      Boolean
+  responseTime      Int
+  ipAddress         String?
+  userAgent         String?
+  errorMessage      String?
+  createdAt         DateTime @default(now())
+  
+  apiClient         ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+
+  @@map("api_usage_logs")
+}
+
+model ApiTransaction {
+  id                String   @id @default(cuid())
+  apiClientId       String
+  type              String
+  amount            Decimal
+  creditsChanged    Int
+  balanceBefore     Int
+  balanceAfter      Int
+  stripePaymentId   String?
+  description       String
+  createdAt         DateTime @default(now())
+  
+  apiClient         ApiClient @relation(fields: [apiClientId], references: [id], onDelete: Cascade)
+
+  @@map("api_transactions")
+}
+
+model VerificationCache {
+  id                String   @id @default(cuid())
+  searchHash        String   @unique
+  userId            String
+  resultData        Json
+  expiresAt         DateTime
+  createdAt         DateTime @default(now())
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, searchHash])
+  @@index([expiresAt])
+  @@map("verification_cache")
+}

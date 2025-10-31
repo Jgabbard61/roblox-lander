@@ -1,0 +1,598 @@
+
+openapi: 3.0.3
+info:
+  title: VerifyLens API
+  description: |
+    Professional Roblox user verification API for law firms and businesses.
+    
+    ## Authentication
+    All API requests require a valid API key to be included in the request header:
+    ```
+    X-API-Key: vl_live_your_api_key_here
+    ```
+    
+    ## Rate Limits
+    - Smart verification: 30 second cooldown between requests
+    - Exact verification: 5 second cooldown between requests
+    
+    ## Credits
+    Each successful verification costs 100 credits. Duplicate requests within 30 days are free.
+    
+    ## Caching
+    All verification results are cached for 30 days to prevent duplicate charges.
+  version: 1.0.0
+  contact:
+    name: VerifyLens Support
+    email: support@verifylens.com
+    url: https://verifylens.com/contact
+  license:
+    name: Private License
+    url: https://verifylens.com/terms
+
+servers:
+  - url: https://api.verifylens.com/v1
+    description: Production server
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /verify/smart:
+    post:
+      summary: Smart Verification
+      description: |
+        Flexible Roblox user verification with optional filters and advanced search capabilities.
+        Uses intelligent matching algorithms to find users even with partial information.
+      operationId: smartVerify
+      tags:
+        - Verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartVerifyRequest'
+            examples:
+              basic:
+                summary: Basic smart verification
+                value:
+                  username: "JohnDoe123"
+              with_filters:
+                summary: Smart verification with filters
+                value:
+                  username: "JohnDoe123"
+                  filters:
+                    minAge: 13
+                    verifiedBadge: true
+                    hasAvatar: true
+                  includeHistory: true
+      responses:
+        '200':
+          description: Verification successful
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+              description: Unique request identifier
+            X-Cache:
+              schema:
+                type: string
+                enum: [HIT, MISS]
+              description: Whether result was served from cache
+            X-Credits-Used:
+              schema:
+                type: integer
+              description: Credits consumed for this request
+            X-Credits-Remaining:
+              schema:
+                type: integer
+              description: Remaining credits in account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/InsufficientCredits'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /verify/exact:
+    post:
+      summary: Exact Verification
+      description: |
+        Precise Roblox user verification for exact username matches.
+        Provides high-confidence verification with detailed user information.
+      operationId: exactVerify
+      tags:
+        - Verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExactVerifyRequest'
+            examples:
+              basic:
+                summary: Basic exact verification
+                value:
+                  username: "ExactUsername"
+              with_user_id:
+                summary: Verification with Roblox user ID
+                value:
+                  username: "ExactUsername"
+                  userId: "123456789"
+                  includeProfile: true
+      responses:
+        '200':
+          description: Verification successful
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+            X-Cache:
+              schema:
+                type: string
+                enum: [HIT, MISS]
+            X-Credits-Used:
+              schema:
+                type: integer
+            X-Credits-Remaining:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/InsufficientCredits'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /account:
+    get:
+      summary: Get Account Information
+      description: Retrieve account details, credit balance, usage statistics, and rate limit status.
+      operationId: getAccount
+      tags:
+        - Account
+      responses:
+        '200':
+          description: Account information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /usage:
+    get:
+      summary: Get API Usage History
+      description: Retrieve detailed usage logs with filtering and pagination options.
+      operationId: getUsage
+      tags:
+        - Usage
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of records per page (max 100)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: endpoint
+          in: query
+          description: Filter by specific endpoint
+          required: false
+          schema:
+            type: string
+            enum: [smart_verify, exact_verify, all]
+            default: all
+        - name: success
+          in: query
+          description: Filter by success status
+          required: false
+          schema:
+            type: string
+            enum: [true, false, all]
+            default: all
+        - name: dateFrom
+          in: query
+          description: Filter from date (ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          description: Filter to date (ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Usage history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication (format: vl_live_xxxx...)
+
+  schemas:
+    SmartVerifyRequest:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Roblox username to verify
+          example: "JohnDoe123"
+        filters:
+          type: object
+          description: Optional filters for smart search
+          properties:
+            minAge:
+              type: integer
+              minimum: 0
+              maximum: 20
+              description: Minimum account age in years
+            maxAge:
+              type: integer
+              minimum: 0
+              maximum: 20
+              description: Maximum account age in years
+            hasAvatar:
+              type: boolean
+              description: Require user to have an avatar
+            hasDescription:
+              type: boolean
+              description: Require user to have a profile description
+            minFriends:
+              type: integer
+              minimum: 0
+              description: Minimum number of friends
+            verifiedBadge:
+              type: boolean
+              description: Require verified badge
+        includeHistory:
+          type: boolean
+          default: false
+          description: Include game history in response
+
+    ExactVerifyRequest:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Exact Roblox username to verify
+          example: "ExactUsername"
+        userId:
+          type: string
+          description: Roblox user ID if available
+          example: "123456789"
+        strictMatch:
+          type: boolean
+          default: true
+          description: Require exact username match
+        includeProfile:
+          type: boolean
+          default: true
+          description: Include detailed profile information
+
+    VerificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          description: Verification result data
+        fromCache:
+          type: boolean
+          description: Whether result was served from cache
+        creditsUsed:
+          type: integer
+          description: Credits consumed for this request
+        currentBalance:
+          type: integer
+          description: Remaining credits in account
+        requestId:
+          type: string
+          description: Unique request identifier
+
+    AccountResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: string
+                email:
+                  type: string
+                name:
+                  type: string
+                companyName:
+                  type: string
+                credits:
+                  type: integer
+                isActive:
+                  type: boolean
+                memberSince:
+                  type: string
+                  format: date-time
+            apiAccess:
+              type: object
+              properties:
+                clientId:
+                  type: string
+                isActive:
+                  type: boolean
+                lastUsed:
+                  type: string
+                  format: date-time
+                createdAt:
+                  type: string
+                  format: date-time
+            usage:
+              type: object
+              properties:
+                last30Days:
+                  type: object
+                  properties:
+                    totalRequests:
+                      type: integer
+                    successfulRequests:
+                      type: integer
+                    duplicateRequests:
+                      type: integer
+                    totalCreditsUsed:
+                      type: integer
+                    successRate:
+                      type: integer
+            rateLimits:
+              type: object
+              properties:
+                smartVerify:
+                  type: object
+                  properties:
+                    cooldownSeconds:
+                      type: integer
+                    remainingCooldown:
+                      type: integer
+                exactVerify:
+                  type: object
+                  properties:
+                    cooldownSeconds:
+                      type: integer
+                    remainingCooldown:
+                      type: integer
+
+    UsageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            logs:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  endpoint:
+                    type: string
+                  requestId:
+                    type: string
+                  creditsUsed:
+                    type: integer
+                  wasSuccessful:
+                    type: boolean
+                  wasDuplicate:
+                    type: boolean
+                  responseTime:
+                    type: integer
+                  createdAt:
+                    type: string
+                    format: date-time
+            summary:
+              type: object
+              properties:
+                totalRequests:
+                  type: integer
+                successfulRequests:
+                  type: integer
+                duplicateRequests:
+                  type: integer
+                totalCreditsUsed:
+                  type: integer
+                successRate:
+                  type: integer
+            pagination:
+              type: object
+              properties:
+                currentPage:
+                  type: integer
+                totalPages:
+                  type: integer
+                totalCount:
+                  type: integer
+                hasNextPage:
+                  type: boolean
+                hasPrevPage:
+                  type: boolean
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error type
+        message:
+          type: string
+          description: Human-readable error message
+        requestId:
+          type: string
+          description: Request identifier for debugging
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Validation failed"
+            message: "Username is required and must be between 1-100 characters"
+
+    Unauthorized:
+      description: Unauthorized - invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Authentication failed"
+            message: "Missing API key. Include X-API-Key header."
+
+    InsufficientCredits:
+      description: Insufficient credits to complete request
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  requiredCredits:
+                    type: integer
+                  currentBalance:
+                    type: integer
+          example:
+            error: "Insufficient credits"
+            message: "This verification requires 100 credits. Please purchase more credits."
+            requiredCredits: 100
+            currentBalance: 50
+
+    NotFound:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "User not found"
+            message: "Unable to find exact match for user"
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds until next request allowed
+        X-RateLimit-Limit:
+          schema:
+            type: string
+          description: Rate limit threshold
+        X-RateLimit-Remaining:
+          schema:
+            type: string
+          description: Remaining requests in window
+        X-RateLimit-Reset:
+          schema:
+            type: string
+          description: UTC time when rate limit resets
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  retryAfter:
+                    type: integer
+          example:
+            error: "Rate limit exceeded"
+            message: "Rate limit exceeded. Retry after 25 seconds."
+            retryAfter: 25
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Internal server error"
+            message: "Verification service temporarily unavailable"
+
+tags:
+  - name: Verification
+    description: User verification endpoints
+  - name: Account
+    description: Account management and information
+  - name: Usage
+    description: API usage tracking and analytics
