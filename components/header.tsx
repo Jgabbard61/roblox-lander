@@ -50,6 +50,16 @@ export default function Header() {
                   Features
                 </Link>
                 <Link 
+                  href="/api-implementation"
+                  className={`font-medium transition-colors ${
+                    pathname === '/api-implementation' 
+                      ? 'text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text' 
+                      : 'text-gray-700 hover:text-purple-600'
+                  }`}
+                >
+                  API
+                </Link>
+                <Link 
                   href="/credits"
                   className={`font-medium transition-colors ${
                     pathname === '/credits' 
@@ -141,6 +151,19 @@ export default function Header() {
                   className="block px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-purple-600 font-medium rounded-lg transition-all"
                 >
                   Features
+                </Link>
+
+                {/* API Link */}
+                <Link
+                  href="/api-implementation"
+                  onClick={closeMobileMenu}
+                  className={`block px-4 py-3 font-medium rounded-lg transition-all ${
+                    pathname === '/api-implementation'
+                      ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-transparent bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text'
+                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-purple-600'
+                  }`}
+                >
+                  API
                 </Link>
 
                 {/* Pricing Link */}
