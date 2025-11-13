@@ -56,8 +56,8 @@ function CreditsContent() {
     {
       name: "Smart Search",
       icon: Brain,
-      credits: 2,
-      price: "$200",
+      credits: 1,
+      price: "$100",
       description: "AI-powered fuzzy matching with ranked results",
       gradient: "from-purple-500 to-purple-600",
       popular: true,
@@ -94,7 +94,7 @@ function CreditsContent() {
       price: 1000, // $1,000
       pricePerCredit: 100,
       exactSearches: "10 searches",
-      smartSearches: "5 searches",
+      smartSearches: "10 searches",
       gradient: "from-blue-400 to-blue-500",
       description: "Perfect for occasional verifications"
     },
@@ -104,7 +104,7 @@ function CreditsContent() {
       price: 5000, // $5,000
       pricePerCredit: 100,
       exactSearches: "50 searches",
-      smartSearches: "25 searches",
+      smartSearches: "50 searches",
       gradient: "from-purple-500 to-purple-600",
       popular: true,
       description: "Most popular for regular use"
@@ -115,7 +115,7 @@ function CreditsContent() {
       price: 10000, // $10,000
       pricePerCredit: 100,
       exactSearches: "100 searches",
-      smartSearches: "50 searches",
+      smartSearches: "100 searches",
       gradient: "from-indigo-500 to-indigo-600",
       description: "Ideal for high-volume firms"
     },
@@ -125,7 +125,7 @@ function CreditsContent() {
       price: 20000, // $20,000
       pricePerCredit: 100,
       exactSearches: "200 searches",
-      smartSearches: "100 searches",
+      smartSearches: "200 searches",
       gradient: "from-pink-500 to-pink-600",
       description: "Maximum value for large teams"
     }
